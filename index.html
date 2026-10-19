@@ -2,255 +2,196 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NoxhLive Overlay</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NoxhLive Overlay</title>
+<style>
+* { box-sizing: border-box; }
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: transparent;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+#promo-widget {
+  position: absolute;
+  top: 40px;
+  right: 30px;
+  width: 465px;
+  opacity: 0;
+  transform: translateX(120%);
+  pointer-events: none;
+}
 
-    #promo-widget {
-      position: absolute;
-      top: 40px;
-      right: 30px;
-      width: 465px;
-      opacity: 0;
-      transform: translateX(120%);
-      pointer-events: none;
-    }
+#promo-widget.show {
+  animation: slideIn .65s cubic-bezier(.2,.8,.2,1) forwards;
+}
 
-    #promo-widget.show {
-      animation: slideIn .65s cubic-bezier(.2,.8,.2,1) forwards;
-    }
+#promo-widget.hide {
+  animation: slideOut .55s ease-in forwards;
+}
 
-    #promo-widget.hide {
-      animation: slideOut .55s ease-in forwards;
-    }
+.promo-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  overflow: hidden;
+  color: #f7f3e9;
+  background: linear-gradient(115deg, #101010, #211b11);
+  border: 1px solid rgba(255,183,56,.75);
+  border-left: 4px solid #ffb52e;
+  border-radius: 11px;
+  box-shadow: 0 7px 28px rgba(0,0,0,.4);
+}
 
-    .promo-card {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 20px;
-      overflow: hidden;
-      color: #f7f3e9;
-      background: linear-gradient(115deg, #101010 0%, #211b11 100%);
-      border: 1px solid rgba(255,183,56,.75);
-      border-left: 4px solid #ffb52e;
-      border-radius: 11px;
-      box-shadow: 0 7px 28px rgba(0,0,0,.4),
-                  0 0 18px rgba(255,158,20,.1);
-    }
+.promo-icon {
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  color: #17120a;
+  background: linear-gradient(145deg, #ffe19a, #f5a623);
+  border-radius: 13px;
+}
 
-    .promo-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        110deg,
-        transparent 35%,
-        rgba(255,187,65,.07) 50%,
-        transparent 65%
-      );
-      pointer-events: none;
-    }
+.promo-icon svg {
+  width: 35px;
+  height: 35px;
+}
 
-    .promo-icon {
-      flex: 0 0 56px;
-      width: 56px;
-      height: 56px;
-      display: grid;
-      place-items: center;
-      color: #17120a;
-      background: linear-gradient(145deg, #ffe19a, #f5a623);
-      border-radius: 13px;
-      box-shadow: 0 0 18px rgba(255,174,40,.15);
-    }
+.promo-copy { position: relative; min-width: 0; }
 
-    .promo-icon svg {
-      width: 35px;
-      height: 35px;
-      display: block;
-    }
+.eyebrow {
+  margin-bottom: 5px;
+  color: #e8ad42;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
 
-    .promo-copy {
-      position: relative;
-      min-width: 0;
-    }
+.headline { font-size: 19px; font-weight: 800; line-height: 1.3; }
 
-    .eyebrow {
-      margin-bottom: 5px;
-      color: #e8ad42;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 1.7px;
-    }
+.subline {
+  margin-top: 5px;
+  color: #c5c0b6;
+  font-size: 12px;
+  line-height: 1.45;
+}
 
-    .headline {
-      font-size: 19px;
-      font-weight: 800;
-      line-height: 1.3;
-    }
+.promo-cta {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 6px 10px;
+  color: #ffcf70;
+  background: rgba(255,181,46,.1);
+  border: 1px solid rgba(255,181,46,.3);
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+}
 
-    .subline {
-      margin-top: 5px;
-      color: #c5c0b6;
-      font-size: 12px;
-      line-height: 1.45;
-    }
+.gold-mark {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3px;
+  height: 100%;
+  background: linear-gradient(transparent, #ffca64, #f29a13, transparent);
+}
 
-    .promo-cta {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 6px 10px;
-      color: #ffcf70;
-      background: rgba(255,181,46,.1);
-      border: 1px solid rgba(255,181,46,.3);
-      border-radius: 5px;
-      font-size: 11px;
-      font-weight: 700;
-    }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(120%); }
+  to { opacity: 1; transform: translateX(0); }
+}
 
-    .gold-mark {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 3px;
-      height: 100%;
-      background: linear-gradient(
-        transparent,
-        #ffca64,
-        #f29a13,
-        transparent
-      );
-    }
-
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateX(120%);
-      }
-      to {
-        opacity: 1;
-        transform: translateX(0);
-      }
-    }
-
-    @keyframes slideOut {
-      from {
-        opacity: 1;
-        transform: translateX(0);
-      }
-      to {
-        opacity: 0;
-        transform: translateX(120%);
-      }
-    }
-  </style>
+@keyframes slideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(120%); }
+}
+</style>
 </head>
-
 <body>
-  <div id="promo-widget">
-    <div class="promo-card">
-      <div class="promo-icon">
-        <!-- Discord logo -->
-        <svg id="discord-logo" viewBox="0 0 24 24"
-             aria-label="Discord Logo">
-          <path fill="currentColor" d="M19.7 5.1A18.8 18.8 0 0 0 15 3.6l-.6 1.2a17.4 17.4 0 0 0-4.8 0L9 3.6a18.8 18.8 0 0 0-4.7 1.5C1.3 9.5.5 13.8.9 18.1a19 19 0 0 0 5.8 3l1.3-2.1-2-1 .5-.4a13.5 13.5 0 0 0 13 0l.5.4-2 1 1.3 2.1a19 19 0 0 0 5.8-3c.5-5-.8-9.2-5.4-13ZM8.8 15.5c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm6.4 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/>
-        </svg>
 
-        <!-- Gold crown for Prime -->
-        <svg id="prime-logo" viewBox="0 0 24 24"
-             aria-label="Krone" style="display:none">
-          <path fill="currentColor" d="M3 18 1.5 6.5 7.2 11 12 3l4.8 8 5.7-4.5L21 18H3Zm1.2 2h15.6v1.5H4.2V20Z"/>
-        </svg>
-      </div>
-
-      <div class="promo-copy">
-        <div class="eyebrow">NOXHLIVE COMMUNITY</div>
-        <div class="headline" id="promo-headline"></div>
-        <div class="subline" id="promo-subline"></div>
-        <div class="promo-cta" id="promo-cta"></div>
-      </div>
-
-      <div class="gold-mark"></div>
+<div id="promo-widget">
+  <div class="promo-card">
+    <div class="promo-icon">
+      <svg id="discord-logo" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M19.7 5.1A18.8 18.8 0 0 0 15 3.6l-.6 1.2a17.4 17.4 0 0 0-4.8 0L9 3.6a18.8 18.8 0 0 0-4.7 1.5C1.3 9.5.5 13.8.9 18.1a19 19 0 0 0 5.8 3l1.3-2.1-2-1 .5-.4a13.5 13.5 0 0 0 13 0l.5.4-2 1 1.3 2.1a19 19 0 0 0 5.8-3c.5-5-.8-9.2-5.4-13ZM8.8 15.5c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm6.4 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/>
+      </svg>
+      <svg id="prime-logo" viewBox="0 0 24 24" style="display:none">
+        <path fill="currentColor" d="M3 18 1.5 6.5 7.2 11 12 3l4.8 8 5.7-4.5L21 18H3Zm1.2 2h15.6v1.5H4.2V20Z"/>
+      </svg>
     </div>
+    <div class="promo-copy">
+      <div class="eyebrow">NOXHLIVE COMMUNITY</div>
+      <div class="headline" id="promo-headline"></div>
+      <div class="subline" id="promo-subline"></div>
+      <div class="promo-cta" id="promo-cta"></div>
+    </div>
+    <div class="gold-mark"></div>
   </div>
+</div>
 
-  <script>
-    const widget = document.getElementById("promo-widget");
-    const headline = document.getElementById("promo-headline");
-    const subline = document.getElementById("promo-subline");
-    const cta = document.getElementById("promo-cta");
-    const discordLogo = document.getElementById("discord-logo");
-    const primeLogo = document.getElementById("prime-logo");
+<script>
+const widget = document.getElementById("promo-widget");
+const headline = document.getElementById("promo-headline");
+const subline = document.getElementById("promo-subline");
+const cta = document.getElementById("promo-cta");
+const discordLogo = document.getElementById("discord-logo");
+const primeLogo = document.getElementById("prime-logo");
 
-    const INTERVAL = 4 * 60 * 1000;
-    const VISIBLE_TIME = 15 * 1000;
+const INTERVAL = 17000; // TEST: 17 Sekunden
+const VISIBLE_TIME = 15000;
 
-    const promos = [
-      {
-        type: "discord",
-        headline: "Werde Teil der Community",
-        subline: "Events, Updates und Verlosungen.",
-        cta: "!dc in den Chat schreiben"
-      },
-      {
-        type: "prime",
-        headline: "Deinen Prime Sub nutzen!",
-        subline: "Du hast Amazon Prime? Unterstütze NoxhLive mit deinem kostenlosen Prime Sub.",
-        cta: "Jetzt Prime Sub verschenken"
-      }
-    ];
+const promos = [
+  {
+    type: "discord",
+    headline: "Werde Teil der Community",
+    subline: "Events, Updates und Verlosungen.",
+    cta: "!dc in den Chat schreiben"
+  },
+  {
+    type: "prime",
+    headline: "Deinen Prime Sub nutzen!",
+    subline: "Du hast Amazon Prime? Unterstütze NoxhLive mit deinem kostenlosen Prime Sub.",
+    cta: "Jetzt Prime Sub verschenken"
+  }
+];
 
-    let promoIndex = 0;
-    let hideTimer;
+let promoIndex = 0;
+let hideTimer;
 
-    function showWidget() {
-      clearTimeout(hideTimer);
+function showWidget() {
+  clearTimeout(hideTimer);
+  const promo = promos[promoIndex];
 
-      const promo = promos[promoIndex];
+  headline.textContent = promo.headline;
+  subline.textContent = promo.subline;
+  cta.textContent = promo.cta;
 
-      headline.textContent = promo.headline;
-      subline.textContent = promo.subline;
-      cta.textContent = promo.cta;
+  discordLogo.style.display = promo.type === "discord" ? "block" : "none";
+  primeLogo.style.display = promo.type === "prime" ? "block" : "none";
 
-      discordLogo.style.display =
-        promo.type === "discord" ? "block" : "none";
+  promoIndex = (promoIndex + 1) % promos.length;
+  widget.classList.remove("hide", "show");
+  void widget.offsetWidth;
+  widget.classList.add("show");
 
-      primeLogo.style.display =
-        promo.type === "prime" ? "block" : "none";
+  hideTimer = setTimeout(() => {
+    widget.classList.remove("show");
+    widget.classList.add("hide");
+  }, VISIBLE_TIME);
+}
 
-      promoIndex = (promoIndex + 1) % promos.length;
-
-      widget.classList.remove("hide", "show");
-      void widget.offsetWidth;
-      widget.classList.add("show");
-
-      hideTimer = setTimeout(() => {
-        widget.classList.remove("show");
-        widget.classList.add("hide");
-      }, VISIBLE_TIME);
-    }
-
-    // Erste Anzeige nach 4 Minuten,
-    // anschließend abwechselnd Discord und Prime
-    showWidget();
-    setInterval(showWidget, 17000);
-    }, INTERVAL);
-  </script>
+showWidget();
+setInterval(showWidget, INTERVAL);
+</script>
 </body>
 </html>
