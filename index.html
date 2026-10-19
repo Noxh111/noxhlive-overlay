@@ -248,9 +248,8 @@
 
     // Erste Anzeige nach 4 Minuten,
     // anschließend abwechselnd Discord und Prime
-    setTimeout(() => {
-      showWidget();
-      setInterval(showWidget, INTERVAL);
+    showWidget();
+    setInterval(showWidget, 17000);
     }, INTERVAL);
   </script>
 </body>
